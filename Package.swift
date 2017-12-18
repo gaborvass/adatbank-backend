@@ -14,7 +14,7 @@ let package = Package(
         .package(url: "https://github.com/tid-kijyun/Kanna.git", .branch("feature/v4.0.0")),
     ],
     targets: [
-        .target(name: "App", dependencies: ["Vapor", "FluentProvider"],
+        .target(name: "App", dependencies: ["Vapor", "FluentProvider", "Kanna"],
                 exclude: [
                     "Config",
                     "Public",
