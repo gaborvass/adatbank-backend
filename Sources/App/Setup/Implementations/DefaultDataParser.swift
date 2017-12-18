@@ -134,37 +134,37 @@ class DefaultDataParser : DataParserProtocol {
     
     func parseLeagues(_ raw: String) -> Array<LeagueObject> {
         var retValue: Array<LeagueObject> = Array<LeagueObject>()
-        let json = SwiftyJSON.parse(raw)
-        let leagues = json["leagues"].arrayValue
-        for i in 0 ..< leagues.count {
-            let id = leagues[i]["id"].stringValue
-            let name = leagues[i]["name"].stringValue
-            
-            let league: LeagueObject = LeagueObject(id)
-            league.leagueName = name
-            
-            retValue.append(league)
-        }
+//        let json = SwiftyJSON.parse(raw)
+//        let leagues = json["leagues"].arrayValue
+//        for i in 0 ..< leagues.count {
+//            let id = leagues[i]["id"].stringValue
+//            let name = leagues[i]["name"].stringValue
+//
+//            let league: LeagueObject = LeagueObject(id)
+//            league.leagueName = name
+//
+//            retValue.append(league)
+//        }
         return retValue;
     }
     
     func parseRounds(_ raw: String) -> Array<RoundObject> {
         var retValue: Array<RoundObject> = Array<RoundObject>()
-        let json = SwiftyJSON.parse(raw)
-        let rounds = json["turns"].arrayValue
-        for i in 0 ..< rounds.count {
-            let id = rounds[i]["turn"].string
-            
-            let ro: RoundObject = RoundObject(id!)
-            ro.roundName = id
-            ro.isCurrent = false
-            retValue.append(ro)
-        }
-        let actualTurn = json["actualTurn"]["turn"].string
-        if actualTurn != nil && actualTurn!.count > 0 {
-            let actualTurnInt = Int.init(actualTurn!)!
-            retValue[actualTurnInt - 1].isCurrent = true
-        }
+//        let json = SwiftyJSON.parse(raw)
+//        let rounds = json["turns"].arrayValue
+//        for i in 0 ..< rounds.count {
+//            let id = rounds[i]["turn"].string
+//            
+//            let ro: RoundObject = RoundObject(id!)
+//            ro.roundName = id
+//            ro.isCurrent = false
+//            retValue.append(ro)
+//        }
+//        let actualTurn = json["actualTurn"]["turn"].string
+//        if actualTurn != nil && actualTurn!.count > 0 {
+//            let actualTurnInt = Int.init(actualTurn!)!
+//            retValue[actualTurnInt - 1].isCurrent = true
+//        }
         return retValue
     }
     
