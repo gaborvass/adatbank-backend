@@ -21,6 +21,7 @@ script:
     - swift build
     - swift build -c release
 
-
-after_success:
-    - eval "$(curl -sL https://swift.vapor.sh/codecov)"
+deploy:
+  provider: heroku
+  api_key:
+    secure: c15ab1bd-a746-4b66-ba34-6492d7e539bc
