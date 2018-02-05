@@ -9,7 +9,7 @@
 import Foundation
 import HTTP
 
-final class GetRoundsResponder {
+final class RoundsResponder {
  
     let dm : DataManager
     

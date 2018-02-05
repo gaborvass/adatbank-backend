@@ -1,5 +1,5 @@
 //
-//  GetFederationsResponder.swift
+//  GetSeasonsResponder.swift
 //  backend
 //
 //  Created by Vass Gábor on 25/08/2017.
@@ -9,8 +9,8 @@
 import Foundation
 import HTTP
 
-final class GetFederationsResponder {
-
+final class SeasonsResponder {
+    
     let dm : DataManager
     
     init(_ dataManager : DataManager) {
@@ -19,13 +19,13 @@ final class GetFederationsResponder {
     
     func respond(_ request: Request) throws -> ResponseRepresentable {
         return try Response.async({ (portal) in
-            self.dm.getFederations({ (federations) in
+            self.dm.getSeasons({ (seasons) in
                 let jsonEncoder = JSONEncoder()
-                let jsonData = try! jsonEncoder.encode(federations)
+                let jsonData = try! jsonEncoder.encode(seasons)
                 let jsonString = String(data: jsonData, encoding: String.Encoding.utf8)!
                 portal.close(with: jsonString)
             })
         })
     }
-    
 }
+

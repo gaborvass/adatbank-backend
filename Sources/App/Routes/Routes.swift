@@ -6,21 +6,22 @@ extension Droplet {
     func setupRoutes() throws {
         
         let dataManager = DataManager(dataLoader: DefaultDataLoader(), dataParser: DefaultDataParser())
-        let getLeaguesResponder = GetLeaguesResponder(dataManager)
-        let getFederationsResponder = GetFederationsResponder(dataManager)
-        let getSeasonsResponder = GetSeasonsResponder(dataManager)
-        let getRoundsResponder = GetRoundsResponder(dataManager)
-        let getResultsResponder = GetResultsResponder(dataManager)
-        let getStandingsResponder = GetStandingsResponder(dataManager)
-        let getBasicDataResponder = GetBasicDataResponder(dataManager)
+        let leaguesResponder = LeaguesResponder(dataManager)
+        let federationsResponder = FederationsResponder(dataManager)
+        let seasonsResponder = SeasonsResponder(dataManager)
+        let roundsResponder = RoundsResponder(dataManager)
+        let resultsResponder = ResultsResponder(dataManager)
+        let standingsResponder = StandingsResponder(dataManager)
+        let basicDataResponder = BasicDataResponder(dataManager)
         
-        get("getFederations", handler: getFederationsResponder.respond)
-        get("getSeasons", handler: getSeasonsResponder.respond)
-        get("getLeagues",":seasonId",":federationId", handler: getLeaguesResponder.respond)
-        get("getRounds",":seasonId",":federationId",":leagueId", handler: getRoundsResponder.respond)
-        get("getResults",":seasonId",":federationId",":leagueId",":roundId", handler: getResultsResponder.respond)
-        get("getStandings",":seasonId",":federationId",":leagueId",":roundId", handler: getStandingsResponder.respond)
-        get("getBasicData", handler: getBasicDataResponder.respond)
+        // routes
+        get("federations", handler: federationsResponder.respond)
+        get("seasons", handler: seasonsResponder.respond)
+        get("leagues",":seasonId",":federationId", handler: leaguesResponder.respond)
+        get("rounds",":seasonId",":federationId",":leagueId", handler: roundsResponder.respond)
+        get("results",":seasonId",":federationId",":leagueId",":roundId", handler: resultsResponder.respond)
+        get("standings",":seasonId",":federationId",":leagueId",":roundId", handler: standingsResponder.respond)
+        get("basicData", handler: basicDataResponder.respond)
 
     }
 }

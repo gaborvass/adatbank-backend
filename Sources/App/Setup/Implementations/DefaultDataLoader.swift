@@ -27,11 +27,11 @@ class DefaultDataLoader : DataLoaderProtocol {
     }
     
     func loadRawResults(seasonId: String!, federationId : String!, leagueId: String!, roundId: String!, success: @escaping (_: String) -> Void, failure: @escaping (_: Error) -> Void) {
-        executeGETRequest(urlString: "http://adatbank.mlsz.hu/index/\(seasonId!)/\(federationId!)/\(leagueId!)/\(roundId!).html", success: success, failure: failure)
+        executeGETRequest(urlString: "http://adatbank.mlsz.hu/league/\(seasonId!)/\(federationId!)/\(leagueId!)/\(roundId!).html", success: success, failure: failure)
     }
 
     func loadRawStandings(seasonId: String!, federationId : String!, leagueId: String!, roundId: String!, success: @escaping (_: String) -> Void, failure: @escaping (_: Error) -> Void) {
-        executeGETRequest(urlString: "http://adatbank.mlsz.hu/index/\(seasonId!)/\(federationId!)/\(leagueId!)/\(roundId!).html", success: success, failure: failure)
+        executeGETRequest(urlString: "http://adatbank.mlsz.hu/league/\(seasonId!)/\(federationId!)/\(leagueId!)/\(roundId!).html", success: success, failure: failure)
     }
 
     func loadRawMatchDetails(matchId: String!, success: @escaping (_: String) -> Void, failure: @escaping (_: Error) -> Void) {
