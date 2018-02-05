@@ -1,26 +1,22 @@
 os:
-    - linux
-    - osx
+- osx
+osx_image: xcode9.2
 language: generic
 sudo: required
 dist: trusty
-
-osx_image: xcode8.3
 before_install:
-    - if [ $TRAVIS_OS_NAME == "osx" ]; then
-            brew tap vapor/tap;
-            brew update;
-            brew install vapor;
-        else
-            eval "$(curl -sL https://apt.vapor.sh)";
-            sudo apt-get install vapor;
-            sudo chmod -R a+rx /usr/;
-        fi
-
+- if [ $TRAVIS_OS_NAME == "osx" ]; then brew tap vapor/tap; brew update; brew install
+  vapor; else eval "$(curl -sL https://apt.vapor.sh)"; sudo apt-get install vapor;
+  sudo chmod -R a+rx /usr/; fi
 script:
-    - swift build
-    - swift build -c release
-    - swift test
-
-after_success:
-    - eval "$(curl -sL https://swift.vapor.sh/codecov)"
+- swift build
+- swift build -c release
+deploy:
+  provider: heroku
+  api_key:
+    secure: Yf8Pgf6cv24MWKnFsLaVThsCaUQI4oOsIwsx9PLFz1fmwVYKk2Mkfc0hSiC/eohT4CF9wJDPIh2F1YSHdOC4lRa9qUyJEr+Sb/gh5zSPjnAkqNN1PG2BZfJVMG/RGROKnETTQJ+zg472vee8IfOGpl2Zy6X3NfGQv0XxykvVcOWaR4RI/fqfao7iGp2xaMierCmwZv3K4kjO6i2E/ZM2p6Gpw5yt7Ga6gq/0dtBAikhyIkqgWf6Un8/nPC7W40o/gz0V7tcNuOFU6/Xze/jsrY5GRIfeoRMN3EhpBbwxexiCHMZjmaRsyam2F2zOFyGUDxjQEqhLUPQEhqNqRwSoJ4wOdGM6S/vRb9KBDNu9NKMiAM2sDM8NPDefZ+TbvhqxxphRy4QHBkBUIGTE0mzlUC6nNQe+UHZJPSAxkgOlTCb8nZZmx3Ny8pBV/8vKn0GV/Hxgc+//4RkMIpd7qxrH8GZgmxgA8H6y1UOm5Xz8jXU2JaqFO0Jppj3c/y06+mZgElJADxC2iD4XQm2mMK6KJv8u2Bja7ABEqdfICjh1SQZYUwNcGS2PgeCOkrB2DS2tcbQ924zFDXsw6fXI3dWI/I/TOeLdTrMXVyB77RiiiJOiiVyT6QZi2CiUfuizO2zX5GvI/qD4MZezOn517Q9+39CjPXq6veYMplgGPn4RbdQ=
+  app: adatbank-backend
+  on:
+    repo: gaborvass/adatbank-backend
+    all_branches: true
+   
