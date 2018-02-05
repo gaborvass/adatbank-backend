@@ -50,7 +50,8 @@ class DefaultDataLoader : DataLoaderProtocol {
     
     private func executeGETRequest(urlString: String!, success: @escaping (_: String) -> Void, failure: @escaping (_: Error) -> Void) {
         let request = URLRequest.init(url: URL(string: urlString)!)
-        let session = URLSession(configuration: URLSessionConfiguration.default)
+        let sessionConfiguration = URLSessionConfiguration.init()
+        let session = URLSession(configuration: sessionConfiguration)
         let task = session.dataTask(with: request, completionHandler: { (data, response, error) -> Void in
             var localError: Error? = error
             var content: String?
