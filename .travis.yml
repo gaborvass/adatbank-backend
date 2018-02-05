@@ -20,7 +20,7 @@ before_install:
 script:
     - swift build
     - swift build -c release
-    - swift test
+
 
 after_success:
     - eval "$(curl -sL https://swift.vapor.sh/codecov)"
