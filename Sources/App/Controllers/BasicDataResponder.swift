@@ -9,7 +9,7 @@
 import Foundation
 import HTTP
 
-final class GetBasicDataResponder {
+final class BasicDataResponder {
     
     let dm : DataManager
     

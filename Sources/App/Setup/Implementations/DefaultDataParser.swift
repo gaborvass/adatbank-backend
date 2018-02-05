@@ -16,10 +16,10 @@ class DefaultDataParser : DataParserProtocol {
         var retValue: Array<MatchObject> = Array<MatchObject>()
         let doc = try! HTML(html: raw, encoding: String.Encoding.utf8)
         // must be only one
-        for link in doc.xpath("//*[@id=\"schedule_box\"]") {
+        for link in doc.xpath("//*[@id=\"match_panel\"]") {
             let innerHtml = link.innerHTML
             let matchesTable = try! HTML(html: innerHtml!, encoding: String.Encoding.utf8)
-            for matchItem in matchesTable.xpath("//*[@class=\"schedule\"]") {
+            for matchItem in matchesTable.xpath("//*[@class=\"schedule \"]") {
                 retValue.append(parseMatchItem(matchItem))
             }
         }
@@ -27,33 +27,45 @@ class DefaultDataParser : DataParserProtocol {
     }
     
     func parseMatchItem(_ item: Kanna.XMLElement) -> MatchObject {
-        let matchId : String = item["rel"]!
-        let mo = MatchObject("")
-        
         let innerHtml = item.innerHTML
         let matchItemHTML = try! HTML(html: innerHtml!, encoding: String.Encoding.utf8)
-        let matchInfo = matchItemHTML.at_xpath("//*[@class=\"matchInfo\"]")?.content
-        if matchInfo != nil {
-            let parsedMatchInfo = parseMatchInfo(matchInfo!)
-            mo.matchInfo = parsedMatchInfo.matchLocation
-            mo.matchDate = parsedMatchInfo.matchDate
-            mo.matchTime = parsedMatchInfo.matchTime
-        }
-        let matchResult = matchItemHTML.at_xpath("//*[@class=\"matchResult\"]")?.content
+
+        let matchIdHTML = matchItemHTML.at_xpath("//*[@class=\"result-cont\"]//a")!
+        let matchId = matchIdHTML["href"]?.string.split(separator: "/").last?.split(separator: ".").first
+        let mo = MatchObject(String(matchId!))
+        let matchResult = matchItemHTML.at_xpath("//*[@class=\"schedule-points\"]")?.content
         if matchResult != nil {
             let parsedMatchResult = parseMatchResult(matchResult!)
             mo.homeTeamGoals = parsedMatchResult.homeGoals
             mo.awayTeamGoals = parsedMatchResult.awayGoals
         }
-        let teamLeft = matchItemHTML.at_xpath("//*[@class=\"teamLeft\"]")
-        let teamRight = matchItemHTML.at_xpath("//*[@class=\"teamRight\"]")
-        let parsedTeamHome = parseMatchTeam(teamLeft)
-        let parsedTeamAway = parseMatchTeam(teamRight)
-        mo.homeTeam = parsedTeamHome.teamName
-        mo.homeTeamLogoUrl = parsedTeamHome.teamLogoUrl
+
+        let matchTime = matchItemHTML.at_xpath("//*[@class=\"team_sorsolas_date\"]//span")?.content
+        if matchTime != nil {
+            mo.matchTime = matchTime
+        }
+
+        let matchDate = matchItemHTML.at_xpath("//*[@class=\"team_sorsolas_date\"]")?.content
+        if matchDate != nil {
+            if (matchTime != nil) {
+                mo.matchDate = matchDate?.replacingOccurrences(of: matchTime!, with: "")
+            } else {
+                mo.matchDate = matchDate
+            }
+        }
+        let matchLocation = matchItemHTML.at_xpath("//*[@class=\"team_sorsolas_arena\"]")?.content
+        if matchLocation != nil {
+            mo.matchInfo = matchLocation
+        }
+
+        let teamLeft = matchItemHTML.at_xpath("//*[@class=\"home_team\"]")?.content
+        let teamRight = matchItemHTML.at_xpath("//*[@class=\"away_team\"]")?.content
         
-        mo.awayTeam = parsedTeamAway.teamName
-        mo.awayTeamLogoUrl = parsedTeamAway.teamLogoUrl
+        mo.homeTeam = teamLeft
+        //mo.homeTeamLogoUrl = t
+        
+        mo.awayTeam = teamRight
+        //mo.awayTeamLogoUrl = parsedTeamAway.teamLogoUrl
         return mo
     }
     
@@ -62,36 +74,15 @@ class DefaultDataParser : DataParserProtocol {
         return (resultParts[0], resultParts[1])
     }
     
-    func parseMatchInfo(_ rawInfo : String) -> (matchDate: String, matchTime: String, matchLocation: String) {
-        let infoParts = rawInfo.components(separatedBy: " ")
+    func parseMatchDate(_ rawInfo : String) -> (matchDate: String, matchTime: String) {
+        let infoParts = rawInfo.components(separatedBy: "<span>")
 
-        var matchTime = infoParts[1]
-        if matchTime.hasSuffix(",") {
-            matchTime = matchTime.replacingOccurrences(of: ",", with: "")
-        }
+//        var matchTime = infoParts[1]
+//        if matchTime.hasSuffix("</span>") {
+//            matchTime = matchTime.replacingOccurrences(of: "</span>", with: "")
+//        }
 
-        var location : String = ""
-        for i in 2 ..< infoParts.count {
-            if infoParts[i].count > 0 {
-                location += "\(infoParts[i]) "
-            }
-        }
-        
-        return (infoParts[0], matchTime, location)
-    }
-    
-    func parseMatchTeam(_ item: Kanna.XMLElement?) -> (teamName: String, teamLogoUrl: String) {
-        var teamName = ""
-        var teamLogoUrl = ""
-        let innerHtml = item?.innerHTML
-        let teamItemHTML = try! HTML(html: innerHtml!, encoding: String.Encoding.utf8)
-        if teamItemHTML.at_xpath("//*[@class=\"teamName\"]")?.content != nil {
-            teamName = (teamItemHTML.at_xpath("//*[@class=\"teamName\"]")?.content!)!
-        }
-        if teamItemHTML.at_xpath("//*[@class=\"teamLogo\"]")?.content != nil {
-            teamLogoUrl = (teamItemHTML.at_xpath("//*[@class=\"teamLogo\"]")?.content!)!
-        }
-        return (teamName, teamLogoUrl)
+        return (infoParts[0],"NA")
     }
     
     func parseSeasons(_ raw: String) -> Array<SeasonObject> {
