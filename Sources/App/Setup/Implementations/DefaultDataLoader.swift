@@ -50,8 +50,7 @@ class DefaultDataLoader : DataLoaderProtocol {
     
     private func executeGETRequest(urlString: String!, success: @escaping (_: String) -> Void, failure: @escaping (_: Error) -> Void) {
         let request = URLRequest.init(url: URL(string: urlString)!)
-        let sessionConfiguration = URLSessionConfiguration.init()
-        let session = URLSession(configuration: sessionConfiguration)
+        let session = URLSession(configuration: URLSessionConfiguration.default)
         let task = session.dataTask(with: request, completionHandler: { (data, response, error) -> Void in
             var localError: Error? = error
             var content: String?
@@ -77,7 +76,8 @@ class DefaultDataLoader : DataLoaderProtocol {
         postRequest.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
         postRequest.httpMethod = "POST"
         postRequest.httpBody = postBody.data(using: .utf8)
-        let task = URLSession.shared.dataTask(with: postRequest, completionHandler: { (data, response, error) -> Void in
+        let session = URLSession(configuration: URLSessionConfiguration.default)
+        let task = session.dataTask(with: postRequest, completionHandler: { (data, response, error) -> Void in
             var localError: Error? = error
             var content: String?
             if (localError == nil) {
