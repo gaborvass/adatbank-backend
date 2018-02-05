@@ -1,27 +1,17 @@
 os:
-    - osx
+- osx
 osx_image: xcode9.2
 language: generic
 sudo: required
 dist: trusty
-
-
 before_install:
-    - if [ $TRAVIS_OS_NAME == "osx" ]; then
-            brew tap vapor/tap;
-            brew update;
-            brew install vapor;
-        else
-            eval "$(curl -sL https://apt.vapor.sh)";
-            sudo apt-get install vapor;
-            sudo chmod -R a+rx /usr/;
-        fi
-
+- if [ $TRAVIS_OS_NAME == "osx" ]; then brew tap vapor/tap; brew update; brew install
+  vapor; else eval "$(curl -sL https://apt.vapor.sh)"; sudo apt-get install vapor;
+  sudo chmod -R a+rx /usr/; fi
 script:
-    - swift build
-    - swift build -c release
-
+- swift build
+- swift build -c release
 deploy:
   provider: heroku
   api_key:
-    secure: c15ab1bd-a746-4b66-ba34-6492d7e539bc
+    secure: P6DkqdZ1tSuWChhgztFeQ2iPiL6TRP+lRIb6OamubbKVaNcMBT4G7a22LFZaA2PySH86VyurQUeij/tT3NTaNFA6unJfQfXUVhpkiTiGQc9A1ptYLodfyQkVgNQAFqYHPxK5uF1syltHDpslxomcJ8v0sxzY1hUrtK3UbGHoL9397xSBDz07KTWQDYf0QECzr5LF7YwDJORJIscgocJ5SrFCIY0sEWiPye+S6Fh0FMiSm4Wocrs4oaniB+A7cgmENkJcsdOj9SS1XiGCRSK6SNHw2kx4fJrKODeLSpacBLvVj6P+0TH5e6q/rlpXKMdsykzALN6R6S+G6MfJlK3+m+RsknrRnqN7ASjMLbYK68OCWupDelDXCedXD4ILFA8rLciBxVyb/J5mxX4WaYjQFUY012AqXcv4CKRJgVCGp1BiQqv9yzKH25bi1/YtgrmcgTTkhu2LBUv8We7jy0/4anmZMh202fEQsNnaAmTgc0yCLSEP6tOn32foYXYHcGiq5CQcykDoCxI9/isbiJGdZriehcf+4WBaVLjZtXxZgbjvZad7V7EjCADGazCviVFLjMSmbcktEPgH8TeASc/5H2n2uMml2+5WM3EkxozvsndvReVYzIMp5hgLkFVTH/klWMbB4wk6CG3fRABi/pLlLoRfhstr3mYYr3A8VhHvrDs=
