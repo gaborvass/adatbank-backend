@@ -26,7 +26,7 @@ final class BasicDataResponder {
                 let federationsString = String(data: federationsData, encoding: String.Encoding.utf8)!
                 let seasonsString = String(data: seasonsData, encoding: String.Encoding.utf8)!
 
-                portal.close(with: "{\"federations:\(federationsString), \"seasons\":\(seasonsString)}")
+                portal.close(with: "{\"federations\":\(federationsString), \"seasons\":\(seasonsString)}")
             })
         })
     }
