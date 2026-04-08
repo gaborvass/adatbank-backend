@@ -1,0 +1,186 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Hungarian Football Data API - Lambda functions connected to API Gateway
+
+Globals:
+  Function:
+    Runtime: python3.11
+    Timeout: 30
+    MemorySize: 512
+    Environment:
+      Variables:
+        PYTHONPATH: /opt/python
+
+Resources:
+  # API Gateway for all endpoints
+  FootballApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Description: Hungarian Football Data API
+      Cors:
+        AllowMethods: "'GET, OPTIONS'"
+        AllowHeaders: "'Content-Type, X-Amz-Date, Authorization, X-Api-Key, X-Amz-Security-Token'"
+        AllowOrigin: "'*'"
+
+  # Federations endpoint
+  FederationsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda/
+      Handler: handlers.federations.lambda_handler
+      Description: Get all football federations
+      Layers:
+        - !Ref DependenciesLayer
+      Events:
+        FederationsApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref FootballApi
+            Path: /federations
+            Method: GET
+
+  # Seasons endpoint
+  SeasonsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda/
+      Handler: handlers.seasons.lambda_handler
+      Description: Get all seasons
+      Layers:
+        - !Ref DependenciesLayer
+      Events:
+        SeasonsApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref FootballApi
+            Path: /seasons
+            Method: GET
+
+  # BasicData endpoint (combined federations + seasons)
+  BasicDataFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda/
+      Handler: handlers.basic_data.lambda_handler
+      Description: Get basic data (federations and seasons)
+      Layers:
+        - !Ref DependenciesLayer
+      Events:
+        BasicDataApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref FootballApi
+            Path: /basicData
+            Method: GET
+
+  # Leagues endpoint
+  LeaguesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda/
+      Handler: handlers.leagues.lambda_handler
+      Description: Get leagues for a season and federation
+      Layers:
+        - !Ref DependenciesLayer
+      Events:
+        LeaguesApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref FootballApi
+            Path: /leagues/{seasonId}/{federationId}
+            Method: GET
+
+  # Rounds endpoint
+  RoundsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda/
+      Handler: handlers.rounds.lambda_handler
+      Description: Get rounds for a season, federation, and league
+      Layers:
+        - !Ref DependenciesLayer
+      Events:
+        RoundsApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref FootballApi
+            Path: /rounds/{seasonId}/{federationId}/{leagueId}
+            Method: GET
+
+  # Results endpoint
+  ResultsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda/
+      Handler: handlers.results.lambda_handler
+      Description: Get match results for a round
+      Layers:
+        - !Ref DependenciesLayer
+      Events:
+        ResultsApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref FootballApi
+            Path: /results/{seasonId}/{federationId}/{leagueId}/{roundId}
+            Method: GET
+
+  # Standings endpoint
+  StandingsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda/
+      Handler: handlers.standings.lambda_handler
+      Description: Get standings for a round
+      Layers:
+        - !Ref DependenciesLayer
+      Events:
+        StandingsApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref FootballApi
+            Path: /standings/{seasonId}/{federationId}/{leagueId}/{roundId}
+            Method: GET
+
+  # Lambda Layer for dependencies
+  DependenciesLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: football-api-dependencies
+      Description: Dependencies for Hungarian Football Data API
+      ContentUri: dependencies/
+      CompatibleRuntimes:
+        - python3.11
+
+Outputs:
+  ApiUrl:
+    Description: API Gateway endpoint URL
+    Value: !Sub 'https://${FootballApi}.execute-api.${AWS::Region}.amazonaws.com/Prod'
+
+  FederationsFunctionArn:
+    Description: Federations Lambda Function ARN
+    Value: !GetAtt FederationsFunction.Arn
+
+  SeasonsFunctionArn:
+    Description: Seasons Lambda Function ARN
+    Value: !GetAtt SeasonsFunction.Arn
+
+  BasicDataFunctionArn:
+    Description: BasicData Lambda Function ARN
+    Value: !GetAtt BasicDataFunction.Arn
+
+  LeaguesFunctionArn:
+    Description: Leagues Lambda Function ARN
+    Value: !GetAtt LeaguesFunction.Arn
+
+  RoundsFunctionArn:
+    Description: Rounds Lambda Function ARN
+    Value: !GetAtt RoundsFunction.Arn
+
+  ResultsFunctionArn:
+    Description: Results Lambda Function ARN
+    Value: !GetAtt ResultsFunction.Arn
+
+  StandingsFunctionArn:
+    Description: Standings Lambda Function ARN
+    Value: !GetAtt StandingsFunction.Arn

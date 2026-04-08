@@ -1,0 +1,25 @@
+# Python dependencies for Hungarian Football Data API Lambda functions
+# Install these in a 'dependencies' directory for Lambda Layer:
+# mkdir -p dependencies/python
+# pip install -r requirements.txt -t dependencies/python
+#
+# Or for local testing:
+# pip install -r requirements.txt
+
+# HTTP client library
+requests==2.31.0
+
+# HTML parsing library
+beautifulsoup4==4.12.2
+
+# XML/HTML parser (faster than html.parser)
+lxml==5.1.0
+
+# Local testing only (not needed for Lambda deployment)
+# Uncomment for running test_local_server.py:
+# flask==3.0.0
+
+# Local testing only (not needed for Lambda deployment)
+# Uncomment for running unit tests:
+# pytest==7.4.3
+# pytest-cov==4.1.0
