@@ -12,6 +12,25 @@ This project converts the Swift Vapor 2 application to AWS Lambda functions writ
 - **API Gateway** for REST API exposure
 - **Lambda Layer** for shared dependencies
 - **AWS SAM** for infrastructure as code deployment
+- **API Key Authentication** for rate limiting
+
+## Authentication
+
+All endpoints require an **API Key** for access control:
+
+- **Only your mobile app** can access the API
+- **Header**: `X-API-Key: your-api-key`
+- **Get Key**: After deployment, the API key is in stack outputs (save it!)
+
+For mobile app integration examples (Swift, Kotlin, Flutter, React Native), see **[MOBILE_INTEGRATION.md](MOBILE_INTEGRATION.md)**.
+
+### Testing Without API Key
+
+For local testing, use the test scripts which don't require an API key:
+```bash
+python test_handlers_cli.py
+python test_local_server.py
+```
 
 ## API Endpoints
 
@@ -139,29 +158,30 @@ aws cloudformation describe-stacks \
 ## Testing the Deployed API
 
 ```bash
-# Set your API URL
+# Set your API URL and API Key
 API_URL="https://xxxxxxxxxx.execute-api.eu-central-1.amazonaws.com/Prod"
+API_KEY="your-api-key-here"  # Get from stack outputs after deployment
 
 # Get federations
-curl $API_URL/federations
+curl -H "X-API-Key: $API_KEY" $API_URL/federations
 
 # Get seasons
-curl $API_URL/seasons
+curl -H "X-API-Key: $API_KEY" $API_URL/seasons
 
 # Get basic data (both federations and seasons)
-curl $API_URL/basicData
+curl -H "X-API-Key: $API_KEY" $API_URL/basicData
 
 # Get leagues for a specific season and federation
-curl $API_URL/leagues/2023/1
+curl -H "X-API-Key: $API_KEY" $API_URL/leagues/2023/1
 
 # Get rounds
-curl $API_URL/rounds/2023/1/1
+curl -H "X-API-Key: $API_KEY" $API_URL/rounds/2023/1/1
 
 # Get results
-curl $API_URL/results/2023/1/1/1
+curl -H "X-API-Key: $API_KEY" $API_URL/results/2023/1/1/1
 
 # Get standings
-curl $API_URL/standings/2023/1/1/1
+curl -H "X-API-Key: $API_KEY" $API_URL/standings/2023/1/1/1
 ```
 
 ## Monitoring and Logs
@@ -196,10 +216,24 @@ aws cloudwatch get-metric-statistics \
 
 ### Common Issues
 
-1. **Timeout Errors**: Increase timeout in `template.yaml` (default: 30 seconds)
-2. **Memory Issues**: Increase memory size (default: 512 MB)
-3. **External API Down**: Check if adatbank.mlsz.hu is accessible
-4. **CORS Errors**: Verify CORS settings in API Gateway
+1. **403 Forbidden**: Missing or invalid API key in `X-API-Key` header
+2. **Timeout Errors**: Increase timeout in `template.yaml` (default: 30 seconds)
+3. **Memory Issues**: Increase memory size (default: 512 MB)
+4. **External API Down**: Check if adatbank.mlsz.hu is accessible
+5. **CORS Errors**: Verify CORS settings in API Gateway
+
+### Getting Your API Key
+
+After deployment, retrieve the API key from stack outputs:
+
+```bash
+aws cloudformation describe-stacks \
+  --stack-name hungarian-football-api \
+  --query 'Stacks[0].Outputs[?OutputKey==`ApiKeyValue`].OutputValue' \
+  --output text
+```
+
+**Important**: Save the API key immediately - AWS only shows it once!
 
 ### Local Testing
 

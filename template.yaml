@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Hungarian Football Data API - Lambda functions connected to API Gateway
+Description: Hungarian Football Data API - Lambda functions with API Key authentication
 
 Globals:
   Function:
@@ -23,6 +23,17 @@ Resources:
         AllowHeaders: "'Content-Type, X-Amz-Date, Authorization, X-Api-Key, X-Amz-Security-Token'"
         AllowOrigin: "'*'"
 
+  # API Key for mobile app authentication
+  MobileAppApiKey:
+    Type: AWS::ApiGateway::ApiKey
+    Properties:
+      Name: FootballAPI-MobileApp-Key
+      Description: API Key for mobile app access only
+      Enabled: true
+      StageKeys:
+        - RestApiId: !Ref FootballApi
+          StageName: !Ref FootballApi.Stage
+
   # Federations endpoint
   FederationsFunction:
     Type: AWS::Serverless::Function
@@ -39,6 +50,8 @@ Resources:
             RestApiId: !Ref FootballApi
             Path: /federations
             Method: GET
+            Auth:
+              ApiKeyRequired: true
 
   # Seasons endpoint
   SeasonsFunction:
@@ -56,6 +69,8 @@ Resources:
             RestApiId: !Ref FootballApi
             Path: /seasons
             Method: GET
+            Auth:
+              ApiKeyRequired: true
 
   # BasicData endpoint (combined federations + seasons)
   BasicDataFunction:
@@ -73,6 +88,8 @@ Resources:
             RestApiId: !Ref FootballApi
             Path: /basicData
             Method: GET
+            Auth:
+              ApiKeyRequired: true
 
   # Leagues endpoint
   LeaguesFunction:
@@ -90,6 +107,8 @@ Resources:
             RestApiId: !Ref FootballApi
             Path: /leagues/{seasonId}/{federationId}
             Method: GET
+            Auth:
+              ApiKeyRequired: true
 
   # Rounds endpoint
   RoundsFunction:
@@ -107,6 +126,8 @@ Resources:
             RestApiId: !Ref FootballApi
             Path: /rounds/{seasonId}/{federationId}/{leagueId}
             Method: GET
+            Auth:
+              ApiKeyRequired: true
 
   # Results endpoint
   ResultsFunction:
@@ -124,6 +145,8 @@ Resources:
             RestApiId: !Ref FootballApi
             Path: /results/{seasonId}/{federationId}/{leagueId}/{roundId}
             Method: GET
+            Auth:
+              ApiKeyRequired: true
 
   # Standings endpoint
   StandingsFunction:
@@ -141,6 +164,8 @@ Resources:
             RestApiId: !Ref FootballApi
             Path: /standings/{seasonId}/{federationId}/{leagueId}/{roundId}
             Method: GET
+            Auth:
+              ApiKeyRequired: true
 
   # Lambda Layer for dependencies
   DependenciesLayer:
@@ -156,6 +181,14 @@ Outputs:
   ApiUrl:
     Description: API Gateway endpoint URL
     Value: !Sub 'https://${FootballApi}.execute-api.${AWS::Region}.amazonaws.com/Prod'
+
+  ApiKeyId:
+    Description: API Key ID
+    Value: !Ref MobileAppApiKey
+
+  ApiKeyValue:
+    Description: API Key Value (IMPORTANT: Save this, you won't be able to see it again!)
+    Value: !GetAtt MobileAppApiKey.Value
 
   FederationsFunctionArn:
     Description: Federations Lambda Function ARN
